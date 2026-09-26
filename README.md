@@ -31,3 +31,36 @@ The total score is a weighted geometric mean, so one very poor criterion pulls t
 Score labels: ≥85 *sangat serasi* (very harmonious), ≥70 *serasi* (harmonious), ≥55 *cukup serasi* (fairly harmonious), ≥40 *kurang serasi* (not very harmonious), and below that *bertabrakan* (clashing).
 
 The most recent palette is saved automatically in the browser (localStorage).
+
+## Sharing between devices
+
+When the page is served by `server/server.js`, the palette is stored on the server, so every device that opens the site sees and edits the same palette. A status dot in the header shows *Tersinkron* (synced), *Menyimpan…* (saving), or *Offline*. Changes from another device appear within about 3 seconds. If two devices edit at the same moment, the last save wins.
+
+Opened directly as a file, the page keeps working and saves only in that browser.
+
+To run the server locally (Node.js 12 or newer, no dependencies):
+
+```sh
+PALET_PASSWORD=choose-a-password node server/server.js
+# open http://127.0.0.1:8080 and log in with any username and that password
+```
+
+## Deploying to a VPS
+
+`deploy/install.sh` sets everything up on a Linux VPS with systemd (Ubuntu, Debian, CentOS, OpenCloudOS, and similar):
+
+- Node.js and the app, running as a systemd service (`palet-pelaminan`).
+- [Caddy](https://caddyserver.com) as the web server (`caddy-palet`), with automatic HTTPS when you give it a domain.
+- A password prompt (HTTP Basic auth) in front of the whole site.
+
+1. In your cloud provider's firewall, allow inbound TCP ports **80** and **443**.
+2. Log in to the VPS as root and run:
+
+   ```sh
+   curl -fsSL https://raw.githubusercontent.com/doelrobymatico/wedpac/claude/eager-ramanujan-v8dv01/deploy/install.sh | sudo bash
+   ```
+
+   The script asks for a password and an optional domain. With a domain, point its DNS A record at the VPS first. Without a domain, the site is served over plain HTTP at the server's IP address.
+3. Open the URL it prints and log in with any username and your password.
+
+To update, run the same command again. The saved palette and password are kept. The palette lives in `/var/lib/palet-pelaminan/palette.json`, and the settings in `/etc/palet-pelaminan.env`.

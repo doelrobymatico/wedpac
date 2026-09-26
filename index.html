@@ -48,6 +48,11 @@ button{cursor:pointer}
 .brand h1{font-family:var(--display);font-weight:400;font-size:clamp(28px,4vw,38px);line-height:1.1;margin:0;letter-spacing:.01em;text-wrap:balance}
 .brand p{margin:6px 0 0;color:var(--muted);max-width:62ch}
 .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sync{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);padding-inline:4px}
+.sync i{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.sync[data-s="ok"] i{background:var(--good)}
+.sync[data-s="busy"] i{background:var(--warn)}
+.sync[data-s="off"] i{background:var(--bad)}
 .btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;font-weight:500;font-size:14px;line-height:1.2}
 .btn:hover{border-color:var(--accent)}
 .btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
@@ -168,6 +173,7 @@ input[type=range]::-moz-range-thumb{width:16px;height:16px;border-radius:50%;bac
       <p>Pilih warna tiap elemen acara, dari panggung sampai seragam among tamu. Skor di samping menilai apakah semuanya serasi.</p>
     </div>
     <div class="actions">
+      <span class="sync" id="sync" hidden role="status"><i></i><span id="sync-t"></span></span>
       <select id="preset" class="btn" aria-label="Pilih contoh palet">
         <option value="">Contoh palet…</option>
       </select>
@@ -380,7 +386,26 @@ let state=null;
 try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&Array.isArray(s.items)&&s.items.length&&s.items.every(x=>/^#[0-9A-F]{6}$/i.test(x.hex)))state=s;}catch(e){}
 if(!state)state={items:presetItems('sage'),sel:2,mode:'ring'};
 if(!(state.sel>=0&&state.sel<state.items.length))state.sel=0;
-function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(state));}catch(e){}if(SYNC.on&&!SYNC.applying)pushSoon();}
+
+/* ---------- sync between devices (only when served by server/server.js) ---------- */
+const SYNC={on:false,version:0,timer:0,dirty:false,inflight:false,applying:false};
+const validItems=it=>Array.isArray(it)&&it.length>0&&it.every(x=>x&&typeof x.name==='string'&&/^#[0-9A-F]{6}$/i.test(x.hex));
+function syncStatus(s,t){const el=$('#sync');el.hidden=false;el.dataset.s=s;$('#sync-t').textContent=t;}
+function pushSoon(){SYNC.dirty=true;syncStatus('busy','Menyimpan…');clearTimeout(SYNC.timer);SYNC.timer=setTimeout(push,500);}
+async function push(){if(SYNC.inflight){SYNC.timer=setTimeout(push,300);return;}SYNC.inflight=true;SYNC.dirty=false;
+  try{const r=await fetch('api/palette',{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({items:state.items}),cache:'no-store'});if(!r.ok)throw new Error(r.status);const d=await r.json();SYNC.version=d.version;if(!SYNC.dirty)syncStatus('ok','Tersinkron');}
+  catch(e){SYNC.dirty=true;syncStatus('off','Gagal menyimpan, mencoba lagi');clearTimeout(SYNC.timer);SYNC.timer=setTimeout(push,4000);}
+  finally{SYNC.inflight=false;}}
+function applyRemote(d){SYNC.version=d.version;if(!validItems(d.items))return;SYNC.applying=true;state.items=d.items;if(state.sel>=state.items.length)state.sel=state.items.length-1;syncPicker(state.items[state.sel].hex);refresh();SYNC.applying=false;}
+async function pull(){if(!SYNC.on||SYNC.dirty||SYNC.inflight||pk.drag)return;
+  try{const r=await fetch('api/palette',{cache:'no-store'});if(!r.ok)throw new Error(r.status);const d=await r.json();if(d.version>SYNC.version&&!SYNC.dirty&&!SYNC.inflight&&!pk.drag)applyRemote(d);if(!SYNC.dirty)syncStatus('ok','Tersinkron');}
+  catch(e){syncStatus('off','Offline, disimpan di perangkat ini');}}
+async function startSync(){if(!/^https?:$/.test(location.protocol))return;
+  try{const r=await fetch('api/palette',{cache:'no-store'});if(!r.ok)return;const d=await r.json();if(!d||typeof d.version!=='number')return;
+    SYNC.on=true;if(validItems(d.items))applyRemote(d);else{SYNC.version=d.version;push();}
+    syncStatus('ok','Tersinkron');setInterval(pull,3000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)pull();});
+  }catch(e){/* no server (opened as a file or elsewhere): stay local */}}
 
 /* ---------- picker ---------- */
 const cv=$('#wheel'),ctx=cv.getContext('2d');
@@ -768,7 +793,7 @@ $('#copy').addEventListener('click',()=>{
 });
 let toastT=0;function toast(m){const t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>t.hidden=true,1800);}
 
-syncPicker(state.items[state.sel].hex);sizePicker();refresh();
+syncPicker(state.items[state.sel].hex);sizePicker();refresh();startSync();
 })();
 </script>
 </body>
