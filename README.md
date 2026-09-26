@@ -1,31 +1,33 @@
 # Palet Pelaminan
 
-Web sederhana (satu file `index.html`, tanpa instalasi) untuk mencocokkan warna acara pernikahan dan memberi skor apakah semuanya serasi.
+A simple web page (a single `index.html`, no install needed) for matching wedding colours and scoring whether they all go together.
 
-## Cara pakai
+The app's interface is in Indonesian.
 
-Buka `index.html` langsung di browser.
+## How to use
 
-1. Pilih elemen di kiri: panggung & dekorasi, bunga, gaun pengantin wanita, busana pengantin pria, seserahan, seragam keluarga, bridesmaid / pagar ayu, panitia / among tamu. Elemen lain bisa ditambah (mis. undangan, souvenir).
-2. Atur warnanya dengan pemilih segitiga:
-   - **Cincin + segitiga**: cincin untuk rona, segitiga untuk mencampur rona murni dengan putih dan hitam.
-   - **Segitiga RGB**: tiap sudut adalah Merah, Hijau, Biru, ditambah slider kecerahan (V).
-   - Bisa juga lewat slider R/G/B, kode hex, atau warna populer pernikahan.
-3. Pratinjau pelaminan menggambar panggung (gebyok berlapis, pilar, tirai, rangkaian bunga), pengantin, orang tua dengan beskap dan kebaya, pagar ayu, meja seserahan, dan among tamu sesuai warna pilihan. Klik bagian gambar untuk langsung memilih elemennya.
-4. Lihat skornya (0–100) dan status tiap elemen: **Match**, **Hampir**, atau **Tidak match**. Kolom saran memberi warna pengganti yang menaikkan skor.
+Open `index.html` directly in a browser.
 
-## Cara penilaian
+1. Pick an element on the left: stage & decor (*panggung & dekorasi*), flowers (*bunga*), bride's gown (*gaun pengantin wanita*), groom's attire (*busana pengantin pria*), wedding gift trays (*seserahan*), family uniforms (*seragam keluarga*), bridesmaids (*bridesmaid / pagar ayu*), and helpers / ushers (*panitia / among tamu*). You can add your own elements, such as invitations or souvenirs.
+2. Set its colour with the triangle picker:
+   - **Ring + triangle** (*Cincin + segitiga*): the ring picks the hue, and the triangle mixes that pure hue with white and black.
+   - **RGB triangle** (*Segitiga RGB*): each corner is Red, Green, or Blue, plus a brightness (V) slider.
+   - You can also use the R/G/B sliders, a hex code, or the popular wedding colour swatches.
+3. The stage preview draws the scene in your chosen colours. It shows a layered *gebyok* backdrop, pillars, drapes and floral arrangements. It also shows the bride and groom, parents in *beskap* and *kebaya*, bridesmaids, the *seserahan* tables, and the ushers. Click any part of the scene to select that element.
+4. Check the score (0–100) and each element's status: **Match**, **Hampir** (close), or **Tidak match** (no match). The suggestions panel proposes replacement colours that raise the score.
 
-| Kriteria | Bobot | Yang dinilai |
+## How scoring works
+
+| Criterion | Weight | What it checks |
 |---|---|---|
-| Harmoni rona | 40% | Rona warna berwarna dicocokkan ke pola monokromatik, analog, komplementer, split-komplementer, atau triadik. Warna netral (putih, krem, abu-abu, hitam) selalu aman. |
-| Pengantin terlihat di panggung | 20% | Selisih warna (ΔE, CIELAB) gaun dan busana pria terhadap panggung; ideal ≥ 20. |
-| Pengantin paling menonjol | 10% | Gaun harus beda dari seragam keluarga, bridesmaid, dan panitia; ideal ΔE ≥ 14. |
-| Keseimbangan | 15% | Maksimal 2 warna mencolok, dan rentang terang-gelap minimal 30. |
-| Tanpa warna bertabrakan | 15% | Warna yang hampir sama tapi tidak persis (ΔE 2–7, mis. ivory vs putih), atau pasangan komplementer yang sama-sama menyala. |
+| Hue harmony | 40% | The hues of coloured (non-neutral) items are fitted to a monochromatic, analogous, complementary, split-complementary, or triadic pattern. Neutrals (white, cream, grey, black) always fit. |
+| Couple visible on stage | 20% | Colour difference (ΔE, CIELAB) between the gown / groom's attire and the stage; ideal ≥ 20. |
+| Bride stands out | 10% | The gown should differ from the family, bridesmaid, and helper uniforms; ideal ΔE ≥ 14. |
+| Balance | 15% | At most 2 vivid colours, and a light-to-dark range of at least 30. |
+| No clashing colours | 15% | Flags colours that are almost but not quite the same (ΔE 2–7, e.g. ivory vs. pure white). Also flags complementary pairs that are both very bright. |
 
-Skor total adalah rata-rata geometrik berbobot, jadi satu kriteria yang sangat buruk ikut menurunkan skor secara nyata.
+The total score is a weighted geometric mean, so one very poor criterion pulls the score down noticeably.
 
-Label skor: ≥85 sangat serasi, ≥70 serasi, ≥55 cukup serasi, ≥40 kurang serasi, di bawahnya bertabrakan.
+Score labels: ≥85 *sangat serasi* (very harmonious), ≥70 *serasi* (harmonious), ≥55 *cukup serasi* (fairly harmonious), ≥40 *kurang serasi* (not very harmonious), and below that *bertabrakan* (clashing).
 
-Palet terakhir tersimpan otomatis di browser (localStorage).
+The most recent palette is saved automatically in the browser (localStorage).
