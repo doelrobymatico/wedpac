@@ -50,17 +50,22 @@ PALET_PASSWORD=choose-a-password node server/server.js
 `deploy/install.sh` sets everything up on a Linux VPS with systemd (Ubuntu, Debian, CentOS, OpenCloudOS, and similar):
 
 - Node.js and the app, running as a systemd service (`palet-pelaminan`).
-- [Caddy](https://caddyserver.com) as the web server (`caddy-palet`), with automatic HTTPS when you give it a domain.
+- On port 80: [Caddy](https://caddyserver.com) as the web server (`caddy-palet`), with automatic HTTPS when you give it a domain.
+- On any other port: the app serves directly over plain HTTP at `http://<server-ip>:<port>`.
 - A password prompt (HTTP Basic auth) in front of the whole site.
 
-1. In your cloud provider's firewall, allow inbound TCP ports **80** and **443**.
-2. Log in to the VPS as root and run:
+1. In your cloud provider's firewall, allow inbound TCP on the port you will use: **80** and **443** for the default setup, or your own port (for example **2001**).
+2. Log in to the VPS as root and run one of these:
 
    ```sh
+   # default: port 80, optional domain with HTTPS
    curl -fsSL https://raw.githubusercontent.com/doelrobymatico/wedpac/claude/eager-ramanujan-v8dv01/deploy/install.sh | sudo bash
+
+   # custom port, e.g. when 80/443 are already used by another site
+   curl -fsSL https://raw.githubusercontent.com/doelrobymatico/wedpac/claude/eager-ramanujan-v8dv01/deploy/install.sh | sudo PORT=2001 bash
    ```
 
-   The script asks for a password and an optional domain. With a domain, point its DNS A record at the VPS first. Without a domain, the site is served over plain HTTP at the server's IP address.
+   The script asks for a password, and on port 80 for an optional domain. With a domain, point its DNS A record at the VPS first. It stops with a message if the chosen port is already taken.
 3. Open the URL it prints and log in with any username and your password.
 
-To update, run the same command again. The saved palette and password are kept. The palette lives in `/var/lib/palet-pelaminan/palette.json`, and the settings in `/etc/palet-pelaminan.env`.
+To update, run the same command again. The saved palette, password and port are kept. The palette lives in `/var/lib/palet-pelaminan/palette.json`, and the settings in `/etc/palet-pelaminan.env`.
