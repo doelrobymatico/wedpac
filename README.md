@@ -11,7 +11,8 @@ Buka `index.html` langsung di browser.
    - **Cincin + segitiga**: cincin untuk rona, segitiga untuk mencampur rona murni dengan putih dan hitam.
    - **Segitiga RGB**: tiap sudut adalah Merah, Hijau, Biru, ditambah slider kecerahan (V).
    - Bisa juga lewat slider R/G/B, kode hex, atau warna populer pernikahan.
-3. Lihat skornya (0–100) dan status tiap elemen: **Match**, **Hampir**, atau **Tidak match**. Kolom saran memberi warna pengganti yang menaikkan skor.
+3. Pratinjau pelaminan menggambar panggung (gebyok berlapis, pilar, tirai, rangkaian bunga), pengantin, orang tua dengan beskap dan kebaya, pagar ayu, meja seserahan, dan among tamu sesuai warna pilihan. Klik bagian gambar untuk langsung memilih elemennya.
+4. Lihat skornya (0–100) dan status tiap elemen: **Match**, **Hampir**, atau **Tidak match**. Kolom saran memberi warna pengganti yang menaikkan skor.
 
 ## Cara penilaian
 
